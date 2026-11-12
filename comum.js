@@ -49,137 +49,90 @@
   }
 
   /* ---- o botão de suporte, em todas as páginas -------------------------
-     Antes era um link mailto: direto, e isso falha calado em três
-     situações comuns: computador sem programa de e-mail configurado,
-     celular sem conta de e-mail, e páginas abertas dentro de outra
-     (pré-visualizações). A pessoa clica e NADA acontece.
+     Um clique, e pronto: abre a conversa. Sem cartão no meio.
 
-     Agora o botão abre um cartãozinho com três saídas. Se uma não
-     funcionar na máquina dela, as outras funcionam.                      */
+     Para onde vai, nesta ordem:
+       1. WhatsApp, se você preencheu `whatsapp` no config.js
+       2. Gmail na web, que funciona em qualquer navegador sem instalar nada
+
+     É um link de verdade (<a>), não um botão com JavaScript: link o
+     navegador sempre abre, enquanto janela aberta por script pode ser
+     bloqueada. E o estilo vai ESCRITO NO ELEMENTO, porque o conta.css tem
+     um `button{width:100%}` que esticava este botão de ponta a ponta da
+     tela. Estilo no elemento ganha de qualquer folha da página — o botão
+     fica igualzinho nas sete abas.                                        */
   (function botaoDeSuporte() {
     if (document.querySelector('.wl-suporte')) return;
     var email = textos.suporte;
     var assunto = 'Suporte WhaLead';
+    var recado = 'Olá! Preciso de ajuda com o WhaLead.';
     var zap = String(C.whatsapp || '').replace(/\D+/g, '');
 
-    /* O CSS abaixo é blindado de propósito: a classe vem dobrada
-       (.wl-suporte.wl-suporte) e todas as medidas estão escritas, mesmo as
-       óbvias. Motivo: o conta.css tem uma regra `button{width:100%}` que
-       pegava este botão e o esticava de ponta a ponta da tela. Widget que
-       mora em página alheia não pode depender do que a página faz. */
+    var destino = zap
+      ? 'https://wa.me/' + zap + '?text=' + encodeURIComponent(recado)
+      : 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(email) +
+        '&su=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(recado);
+
+    /* o que não dá para escrever no elemento: passar o mouse, foco,
+       celular e impressão. Vai com !important para vencer o que está
+       escrito no elemento.                                               */
     var css = document.createElement('style');
     css.textContent = [
-      '.wl-suporte.wl-suporte{position:fixed;right:20px;bottom:20px;left:auto;top:auto;',
-      'z-index:60;display:inline-flex;align-items:center;justify-content:center;gap:9px;',
-      'width:auto;min-width:0;max-width:none;height:auto;min-height:0;box-sizing:border-box;',
-      'margin:0;padding:13px 18px;background:#112b24;color:#fff;',
-      'border:1px solid rgba(255,255,255,.08);border-radius:40px;',
-      'font:650 13.5px/1 "DM Sans",system-ui,sans-serif;letter-spacing:0;text-align:center;',
-      'text-transform:none;text-decoration:none;white-space:nowrap;cursor:pointer;opacity:1;',
-      'box-shadow:0 8px 24px rgba(17,43,36,.22);',
-      'transition:background .18s,transform .18s,box-shadow .18s}',
-      '.wl-suporte.wl-suporte:hover{background:#17cb68;transform:translateY(-2px);',
-      'box-shadow:0 12px 28px rgba(23,203,104,.34)}',
-      '.wl-suporte.wl-suporte:focus-visible{outline:3px solid #17cb68;outline-offset:3px}',
-      '.wl-suporte.wl-suporte svg{width:17px;height:17px;flex:none;display:block}',
-      '.wl-suporte.wl-suporte span{display:inline;font:inherit;color:inherit}',
-
-      '.wl-sup-cx.wl-sup-cx{position:fixed;right:20px;bottom:76px;left:auto;top:auto;z-index:61;',
-      'width:290px;max-width:calc(100vw - 40px);box-sizing:border-box;margin:0;padding:18px;',
-      'background:#fff;border:1px solid #e3eae5;border-radius:16px;display:none;',
-      'box-shadow:0 18px 44px rgba(17,43,36,.18);text-align:left;',
-      'font:400 14px/1.5 "DM Sans",system-ui,sans-serif;color:#112b24}',
-      '.wl-sup-cx.wl-sup-cx.on{display:block}',
-      '.wl-sup-cx.wl-sup-cx h4{margin:0 0 4px;padding:0;color:#112b24;',
-      'font:750 16px/1.2 Manrope,system-ui,sans-serif;letter-spacing:-.3px}',
-      '.wl-sup-cx.wl-sup-cx p{margin:0 0 14px;padding:0;font-size:12.5px;color:#728078;',
-      'line-height:1.5;text-align:left}',
-      '.wl-sup-cx.wl-sup-cx a,.wl-sup-cx.wl-sup-cx button{display:flex;align-items:center;',
-      'justify-content:center;gap:8px;box-sizing:border-box;width:100%;min-height:0;',
-      'margin:0 0 8px;padding:11px 12px;border-radius:10px;border:1px solid #e3eae5;',
-      'background:#fff;color:#112b24;text-decoration:none;cursor:pointer;opacity:1;',
-      'font:650 13.5px/1.3 "DM Sans",system-ui,sans-serif;text-align:center;',
-      'transition:background .15s,border-color .15s}',
-      '.wl-sup-cx.wl-sup-cx a:hover,.wl-sup-cx.wl-sup-cx button:hover{background:#f7f9f5;',
-      'border-color:#cfe0d5;transform:none}',
-      '.wl-sup-cx.wl-sup-cx .zap{background:#17cb68;border-color:#17cb68;color:#fff}',
-      '.wl-sup-cx.wl-sup-cx .zap:hover{background:#14a85b;border-color:#14a85b}',
-      '.wl-sup-cx.wl-sup-cx .wl-sup-end{margin:12px 0 0;padding:12px 0 0;',
-      'border-top:1px solid #eef3ef;font-size:12px;color:#728078;text-align:center;',
-      'word-break:break-all}',
-      '.wl-sup-cx.wl-sup-cx .wl-sup-end b{color:#112b24;font-weight:650}',
-
-      '@media(max-width:700px){.wl-suporte.wl-suporte{bottom:84px;right:14px;',
-      'padding:12px 15px;font-size:12.5px}',
-      '.wl-sup-cx.wl-sup-cx{bottom:140px;right:14px;left:14px;width:auto;max-width:none}}',
-      '@media print{.wl-suporte.wl-suporte,.wl-sup-cx.wl-sup-cx{display:none}}'
+      '.wl-suporte:hover{background:#17cb68 !important;transform:translateY(-2px) !important;',
+      'box-shadow:0 12px 28px rgba(23,203,104,.34) !important}',
+      '.wl-suporte:focus-visible{outline:3px solid #17cb68 !important;outline-offset:3px !important}',
+      '@media(max-width:700px){.wl-suporte{bottom:84px !important;right:14px !important;',
+      'padding:12px 15px !important;font-size:12.5px !important}}',
+      '@media print{.wl-suporte{display:none !important}}'
     ].join('');
     document.head.appendChild(css);
 
-    var bt = document.createElement('button');
-    bt.className = 'wl-suporte';
-    bt.type = 'button';
-    bt.setAttribute('aria-label', 'Falar com o suporte');
-    bt.innerHTML =
+    var a = document.createElement('a');
+    a.className = 'wl-suporte';
+    a.href = destino;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = zap ? 'Falar com o suporte no WhatsApp'
+                  : 'Falar com o suporte: ' + email;
+    a.setAttribute('aria-label', a.title);
+    a.innerHTML =
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
-      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ' +
+      'style="width:17px;height:17px;flex:none;display:block">' +
       '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-4.2-1L3 20l1.2-4.3A8.4 8.4 0 0 1 ' +
       '3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg><span>Suporte</span>';
 
-    var cx = document.createElement('div');
-    cx.className = 'wl-sup-cx';
-    cx.innerHTML =
-      '<h4>Falar com o suporte</h4>' +
-      '<p>Conte o que aconteceu e diga o e-mail que você usou na compra.</p>' +
-      (zap
-        ? '<a class="zap" target="_blank" rel="noopener" href="https://wa.me/' + zap +
-          '?text=' + encodeURIComponent('Olá! Preciso de ajuda com o WhaLead.') +
-          '">Abrir o WhatsApp</a>'
-        : '') +
-      '<a target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1' +
-        '&to=' + encodeURIComponent(email) + '&su=' + encodeURIComponent(assunto) +
-        '">Escrever pelo Gmail</a>' +
-      '<a href="mailto:' + email + '?subject=' + encodeURIComponent(assunto) +
-        '">Usar meu programa de e-mail</a>' +
-      '<button type="button" class="wl-sup-copy">Copiar o endereço</button>' +
-      '<p class="wl-sup-end">ou escreva para <b>' + email + '</b></p>';
-
-    document.body.appendChild(bt);
-    document.body.appendChild(cx);
-
-    var aberto = false;
-    function mostrar(v) { aberto = v; cx.classList.toggle('on', v);
-      bt.setAttribute('aria-expanded', v ? 'true' : 'false'); }
-    bt.addEventListener('click', function (e) { e.stopPropagation(); mostrar(!aberto); });
-
-    /* qualquer link da página pode abrir o cartão: data-abrir-suporte */
-    document.querySelectorAll('[data-abrir-suporte]').forEach(function (el) {
-      el.style.cursor = 'pointer';
-      el.addEventListener('click', function (e) {
-        e.preventDefault(); e.stopPropagation(); mostrar(true);
-      });
+    /* cada medida escrita no próprio elemento: nenhuma folha da página alcança */
+    var medidas = {
+      position: 'fixed', right: '20px', bottom: '20px', left: 'auto', top: 'auto',
+      zIndex: '60', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      gap: '9px', width: 'auto', minWidth: '0', maxWidth: 'none',
+      height: 'auto', minHeight: '0', boxSizing: 'border-box',
+      margin: '0', padding: '13px 18px',
+      background: '#112b24', color: '#fff', border: '1px solid rgba(255,255,255,.08)',
+      borderRadius: '40px', font: '650 13.5px/1 "DM Sans",system-ui,sans-serif',
+      letterSpacing: '0', textAlign: 'center', textTransform: 'none',
+      textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'pointer', opacity: '1',
+      boxShadow: '0 8px 24px rgba(17,43,36,.22)',
+      transition: 'background .18s,transform .18s,box-shadow .18s'
+    };
+    Object.keys(medidas).forEach(function (k) {
+      /* !important no próprio elemento: ganha até de folha com !important */
+      a.style.setProperty(k.replace(/[A-Z]/g, function (m) { return '-' + m.toLowerCase(); }),
+        medidas[k], 'important');
     });
-    document.addEventListener('click', function (e) {
-      if (aberto && !cx.contains(e.target)) mostrar(false); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && aberto) mostrar(false); });
+    document.body.appendChild(a);
 
-    /* copiar funciona até onde a área de transferência moderna não funciona */
-    cx.querySelector('.wl-sup-copy').addEventListener('click', function () {
-      var b = this, antes = b.textContent;
-      var pronto = function () { b.textContent = 'Copiado!';
-        setTimeout(function () { b.textContent = antes; }, 1800); };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(email).then(pronto, velhoJeito);
-      } else velhoJeito();
-      function velhoJeito() {
-        var t = document.createElement('textarea');
-        t.value = email; t.style.position = 'fixed'; t.style.opacity = '0';
-        document.body.appendChild(t); t.select();
-        try { document.execCommand('copy'); pronto(); }
-        catch (e) { b.textContent = email; }
-        document.body.removeChild(t);
-      }
+    /* se o navegador tiver guardado a versão antiga em cache e ela já tiver
+       desenhado o cartão de opções, varre daqui                            */
+    document.querySelectorAll('.wl-sup-cx').forEach(function (v) { v.remove(); });
+
+    /* "Esqueci minha senha" e qualquer outro link marcado vão para o mesmo lugar */
+    document.querySelectorAll('[data-abrir-suporte]').forEach(function (el) {
+      el.setAttribute('href', destino);
+      el.setAttribute('target', '_blank');
+      el.setAttribute('rel', 'noopener');
+      el.style.cursor = 'pointer';
     });
   })();
 

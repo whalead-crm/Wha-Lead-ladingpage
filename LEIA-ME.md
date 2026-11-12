@@ -86,34 +86,17 @@ preencha e a página passa a mostrar a parcela.
 
 ## 4. O botão de suporte
 
-Botão escuro e arredondado, fixo no canto **inferior direito**, nas sete páginas.
+Botão escuro e arredondado, fixo no canto **inferior direito**, igual nas sete
+páginas. **Um clique e abre a conversa** — sem menu, sem cartão, sem escolha.
 
-**Ele não é um link de e-mail.** Já foi, e era um erro: `mailto:` depende de a
-pessoa ter um programa de e-mail configurado. Quem não tem — e é muita gente,
-principalmente no celular — clicava e **não acontecia nada**. Pior tipo de
-defeito: o silencioso.
+Para onde ele vai, nesta ordem:
 
-Agora o botão abre um cartãozinho com saídas que não dependem de configuração:
+1. **WhatsApp**, se você preencher `whatsapp` no `config.js`
+2. **Gmail na web**, que é o que funciona em qualquer navegador sem instalar nada
 
-| Opção | Funciona quando |
-|---|---|
-| **Abrir o WhatsApp** | aparece só se você preencher `whatsapp` no `config.js` |
-| **Escrever pelo Gmail** | em qualquer navegador, sem instalar nada |
-| **Usar meu programa de e-mail** | o `mailto:` de sempre, para quem tem Outlook e afins |
-| **Copiar o endereço** | sempre — e o e-mail ainda fica escrito no cartão |
-
-Fecha clicando fora ou com Esc. No celular ele sobe sozinho para não cobrir a
-barra de compra, e some na impressão. O link **"Esqueci minha senha"**, na tela
-de entrar, abre esse mesmo cartão — antes era um `mailto:` que não fazia nada.
-
-### Por que o CSS dele é "exagerado"
-
-O `conta.css` tem uma regra `button{width:100%}`, pensada para os botões dos
-formulários. Ela pegava o botão de suporte junto e o esticava de ponta a ponta
-da tela, virando uma barra preta no rodapé. Agora o CSS do botão vem com a
-classe dobrada (`.wl-suporte.wl-suporte`) e com todas as medidas escritas,
-mesmo as óbvias — assim nenhuma regra da página o alcança. Se um dia você
-mexer no `conta.css`, o botão continua inteiro.
+Em qualquer um dos dois a mensagem já vai começada: *"Olá! Preciso de ajuda com
+o WhaLead."* O link **"Esqueci minha senha"**, na tela de entrar, vai para o
+mesmo lugar.
 
 ### Ligue o WhatsApp — leva dez segundos
 
@@ -124,15 +107,28 @@ mensagem, não escrever e-mail. No `config.js`:
 whatsapp: '5511987654321',   // DDI + DDD + número, só dígitos
 ```
 
-Pronto: nasce um botão verde no topo do cartão, abrindo a conversa com a
-mensagem *"Olá! Preciso de ajuda com o WhaLead."* já digitada. Em branco, o
-botão simplesmente não aparece e o resto continua funcionando.
+O botão passa a abrir a conversa direto. Em branco, ele usa o Gmail.
 
-Para mudar o e-mail, mesma coisa, uma linha:
+Para trocar o e-mail, mesma coisa, uma linha:
 
 ```js
 suporte: 'whalead.crm@gmail.com',
 ```
+
+### Dois defeitos que já aconteceram aqui
+
+**Virou uma barra preta de ponta a ponta.** O `conta.css` tem
+`button{width:100%}`, pensado para os botões dos formulários, e ele pegava o
+botão de suporte junto. Agora cada medida vai **escrita no próprio elemento** —
+estilo no elemento ganha de qualquer folha da página. Mexer no `conta.css`
+amanhã não quebra mais nada.
+
+**Clicar não fazia nada.** Era um `mailto:`, que só funciona em quem tem
+programa de e-mail configurado. Virou link normal para o WhatsApp ou o Gmail:
+link o navegador sempre abre.
+
+O `teste-botao.js` carrega as sete páginas num navegador de verdade e mede o
+botão em cada uma. Se ele deformar ou parar de ir direto, o teste quebra.
 
 ---
 
