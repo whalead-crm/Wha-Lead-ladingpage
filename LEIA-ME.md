@@ -103,7 +103,17 @@ Agora o botão abre um cartãozinho com saídas que não dependem de configuraç
 | **Copiar o endereço** | sempre — e o e-mail ainda fica escrito no cartão |
 
 Fecha clicando fora ou com Esc. No celular ele sobe sozinho para não cobrir a
-barra de compra, e some na impressão.
+barra de compra, e some na impressão. O link **"Esqueci minha senha"**, na tela
+de entrar, abre esse mesmo cartão — antes era um `mailto:` que não fazia nada.
+
+### Por que o CSS dele é "exagerado"
+
+O `conta.css` tem uma regra `button{width:100%}`, pensada para os botões dos
+formulários. Ela pegava o botão de suporte junto e o esticava de ponta a ponta
+da tela, virando uma barra preta no rodapé. Agora o CSS do botão vem com a
+classe dobrada (`.wl-suporte.wl-suporte`) e com todas as medidas escritas,
+mesmo as óbvias — assim nenhuma regra da página o alcança. Se um dia você
+mexer no `conta.css`, o botão continua inteiro.
 
 ### Ligue o WhatsApp — leva dez segundos
 
