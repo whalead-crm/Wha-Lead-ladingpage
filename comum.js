@@ -21,8 +21,23 @@
     var v = textos[e.getAttribute('data-t')];
     if (v !== undefined) e.textContent = v;
   });
+  /* ---- um endereço de suporte só, usado por tudo ----------------------
+     `mailto:` não serve: só funciona em quem tem programa de e-mail
+     configurado, e em celular normalmente não faz nada. O Gmail na web
+     abre em qualquer navegador, já com destinatário e assunto prontos.  */
+  var recadoSuporte = 'Olá! Preciso de ajuda com o WhaLead.';
+  var LINK_EMAIL = 'https://mail.google.com/mail/?view=cm&fs=1' +
+    '&to=' + encodeURIComponent(textos.suporte) +
+    '&su=' + encodeURIComponent('Suporte WhaLead') +
+    '&body=' + encodeURIComponent(recadoSuporte);
+
+  /* todo link de e-mail do site, em qualquer página, vai para o mesmo lugar */
   document.querySelectorAll('[data-suporte]').forEach(function (e) {
-    e.setAttribute('href', 'mailto:' + textos.suporte);
+    e.setAttribute('href', LINK_EMAIL);
+    e.setAttribute('target', '_blank');
+    e.setAttribute('rel', 'noopener');
+    e.setAttribute('title', 'Escrever para ' + textos.suporte);
+    e.style.cursor = 'pointer';
     // data-suporte="texto" mantém o rótulo escrito no HTML;
     // vazio, o link mostra o e-mail que estiver no config.js
     if (e.getAttribute('data-suporte') !== 'texto') e.textContent = textos.suporte;
@@ -64,14 +79,10 @@
   (function botaoDeSuporte() {
     if (document.querySelector('.wl-suporte')) return;
     var email = textos.suporte;
-    var assunto = 'Suporte WhaLead';
-    var recado = 'Olá! Preciso de ajuda com o WhaLead.';
     var zap = String(C.whatsapp || '').replace(/\D+/g, '');
-
     var destino = zap
-      ? 'https://wa.me/' + zap + '?text=' + encodeURIComponent(recado)
-      : 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(email) +
-        '&su=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(recado);
+      ? 'https://wa.me/' + zap + '?text=' + encodeURIComponent(recadoSuporte)
+      : LINK_EMAIL;
 
     /* o que não dá para escrever no elemento: passar o mouse, foco,
        celular e impressão. Vai com !important para vencer o que está
@@ -128,7 +139,7 @@
     document.querySelectorAll('.wl-sup-cx').forEach(function (v) { v.remove(); });
 
     /* "Esqueci minha senha" e qualquer outro link marcado vão para o mesmo lugar */
-    document.querySelectorAll('[data-abrir-suporte]').forEach(function (el) {
+    document.querySelectorAll('[data-abrir-suporte],[data-suporte-botao]').forEach(function (el) {
       el.setAttribute('href', destino);
       el.setAttribute('target', '_blank');
       el.setAttribute('rel', 'noopener');
