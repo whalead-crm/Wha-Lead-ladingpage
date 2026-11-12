@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Criar conta — WhaLead</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="brand.png">
+<link rel="stylesheet" href="conta.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html"><img src="logo-whalead.png" alt="WhaLead"></a>
+  <nav>Já tem conta? <a href="entrar.html" style="color:#11b95d;font-weight:650">Entrar</a></nav>
+</header>
+
+<main><div class="caixa">
+  <h1>Criar sua conta</h1>
+  <p class="sub">É com ela que você entra na extensão e acompanha sua compra.</p>
+
+  <div class="selo"><span>✓</span><span><b>Criar a conta não custa nada.</b>
+    O pagamento vem no passo seguinte, e você tem
+    <span data-t="garantia">7</span> dias de garantia.</span></div>
+
+  <form id="f" novalidate>
+    <div class="erro" id="erro"></div>
+    <div class="campo">
+      <label for="nome">Seu nome</label>
+      <input id="nome" autocomplete="name" placeholder="Como quer ser chamado">
+    </div>
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+      <p class="dica">Use um e-mail que você consulta — é por ele que falamos com você.</p>
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="new-password"
+             placeholder="Pelo menos 8 letras ou números" required>
+      <p class="dica">Misture letras e números. Nada de datas de aniversário.</p>
+    </div>
+    <button id="bt" type="submit">Criar conta e continuar</button>
+  </form>
+
+  <p class="pe">Ao criar a conta você aceita os <a href="termos.html">termos de uso</a>
+    e a <a href="privacidade.html">política de privacidade</a>.</p>
+</div></main>
+
+<footer>© <span data-t="ano">2026</span> WhaLead ·
+  <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(function () {
+  var C = window.WHALEAD_CONFIG || {};
+  var f = document.getElementById('f'), bt = document.getElementById('bt'),
+      cx = document.getElementById('erro');
+
+  function erro(t) { cx.textContent = t; cx.className = 'erro on';
+    bt.disabled = false; bt.textContent = 'Criar conta e continuar'; }
+
+  f.addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    cx.className = 'erro';
+    var email = document.getElementById('email').value.trim(),
+        senha = document.getElementById('senha').value;
+    if (!email) return erro('Escreva seu e-mail.');
+    if (senha.length < 8) return erro('A senha precisa de pelo menos 8 letras ou números.');
+
+    if (!C.api) {   // servidor ainda não publicado: segue direto ao pagamento
+      location.href = C.checkoutUrl || 'index.html';
+      return;
+    }
+    bt.disabled = true; bt.textContent = 'Criando…';
+    try {
+      var r = await fetch(C.api + '/criar-conta', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ nome: document.getElementById('nome').value.trim(),
+          email: email, senha: senha, apelido: 'Site' })
+      });
+      var j = await r.json();
+      if (!j.ok) return erro(j.erro === 'ja_existe'
+        ? 'Já existe uma conta com esse e-mail. Use "Entrar" ali em cima.'
+        : (j.erro || 'Não consegui criar a conta agora. Tente de novo.'));
+      localStorage.setItem('wl_sessao', j.sessao);
+      localStorage.setItem('wl_email', j.email);
+      location.href = 'painel.html?comprar=1';
+    } catch (e) {
+      erro('Não consegui falar com o servidor. Confira sua internet e tente de novo.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

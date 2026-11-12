@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entrar — WhaLead</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="brand.png">
+<link rel="stylesheet" href="conta.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html"><img src="logo-whalead.png" alt="WhaLead"></a>
+  <nav>Não tem conta? <a href="criar-conta.html" style="color:#11b95d;font-weight:650">Criar conta</a></nav>
+</header>
+
+<main><div class="caixa">
+  <h1>Entrar</h1>
+  <p class="sub">Acompanhe sua compra e libere a extensão.</p>
+
+  <form id="f" novalidate>
+    <div class="erro" id="erro"></div>
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="email" placeholder="voce@email.com" required autofocus>
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+    </div>
+    <div class="esq"><a data-suporte="texto">Esqueci minha senha</a></div>
+    <button id="bt" type="submit">Entrar</button>
+  </form>
+
+  <p class="pe">Ainda não comprou? <a href="criar-conta.html">Conhecer o WhaLead Pro</a></p>
+</div></main>
+
+<footer>© <span data-t="ano">2026</span> WhaLead ·
+  <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(function () {
+  var C = window.WHALEAD_CONFIG || {};
+  var f = document.getElementById('f'), bt = document.getElementById('bt'),
+      cx = document.getElementById('erro');
+  var g = localStorage.getItem('wl_email');
+  if (g) document.getElementById('email').value = g;
+
+  function erro(t) { cx.textContent = t; cx.className = 'erro on';
+    bt.disabled = false; bt.textContent = 'Entrar'; }
+
+  f.addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    cx.className = 'erro';
+    if (!C.api) return erro('O sistema de contas ainda não está no ar. ' +
+      'Fale com o suporte: ' + (C.suporte || ''));
+    bt.disabled = true; bt.textContent = 'Entrando…';
+    try {
+      var r = await fetch(C.api + '/entrar', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: document.getElementById('email').value.trim(),
+          senha: document.getElementById('senha').value, apelido: 'Site' })
+      });
+      var j = await r.json();
+      if (!j.ok) return erro(j.erro || 'Não consegui entrar agora. Tente de novo.');
+      localStorage.setItem('wl_sessao', j.sessao);
+      localStorage.setItem('wl_email', j.email);
+      location.href = 'painel.html';
+    } catch (e) {
+      erro('Não consegui falar com o servidor. Confira sua internet e tente de novo.');
+    }
+  });
+})();
+</script>
+</body>
+</html>

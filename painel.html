@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minha conta — WhaLead</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="brand.png">
+<link rel="stylesheet" href="conta.css">
+<style>main{place-items:start center}.caixa{max-width:700px}</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="index.html"><img src="logo-whalead.png" alt="WhaLead"></a>
+  <nav><button class="sairlink" id="sair">Sair</button></nav>
+</header>
+
+<main><div class="caixa">
+  <div class="carregando" id="carregando">Carregando sua conta…</div>
+
+  <div id="tudo" class="oculto">
+    <h1>Minha conta</h1>
+    <p class="sub" id="ola">—</p>
+    <div class="erro" id="erro"></div>
+
+    <div class="cartao">
+      <span class="pino" id="pino">—</span>
+      <h2 id="titulo">—</h2>
+      <p id="detalhe">—</p>
+      <div id="acoes" style="margin-top:20px"></div>
+    </div>
+
+    <div class="cartao oculto" id="comoUsar">
+      <h3>Como liberar a extensão</h3>
+      <ol>
+        <li>Instale o <b>WhaLead</b> no Chrome, se ainda não instalou.</li>
+        <li>Abra o WhatsApp Web e clique no ícone do WhaLead.</li>
+        <li>Entre com <b>este mesmo e-mail e senha</b>. Pronto.</li>
+      </ol>
+    </div>
+
+    <div class="cartao">
+      <h3>Seus dados</h3>
+      <dl>
+        <dt>E-mail</dt><dd id="dEmail">—</dd>
+        <dt>Nome</dt><dd id="dNome">—</dd>
+        <dt>Cliente desde</dt><dd id="dDesde">—</dd>
+        <dt>Computador conectado</dt><dd id="dPc">—</dd>
+      </dl>
+      <p style="margin-top:16px;font-size:13.5px">Precisa de recibo, quer trocar de
+        computador ou desistir da compra? Escreva para
+        <a data-suporte style="color:#11b95d;font-weight:650">suporte@whalead.com.br</a>.</p>
+    </div>
+  </div>
+</div></main>
+
+<footer>© <span data-t="ano">2026</span> WhaLead ·
+  <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
+
+<script src="config.js"></script>
+<script src="comum.js"></script>
+<script>
+(function () {
+  var C = window.WHALEAD_CONFIG || {};
+  var sessao = localStorage.getItem('wl_sessao');
+  var el = function (i) { return document.getElementById(i); };
+
+  if (!C.api) {        // servidor ainda não publicado
+    el('carregando').innerHTML = 'A área do cliente entra no ar junto com o servidor ' +
+      'de licenças.<br><br><a class="btn verde" style="max-width:280px;margin:0 auto" ' +
+      'href="index.html">Voltar para o site</a>';
+    return;
+  }
+  if (!sessao) { location.replace('entrar.html'); return; }
+
+  function diaBR(iso) { if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
+    var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function erro(t) { el('erro').textContent = t; el('erro').className = 'erro on'; }
+
+  el('sair').onclick = function () {
+    fetch(C.api + '/sair', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessao: sessao }) }).catch(function () {});
+    localStorage.removeItem('wl_sessao');
+    location.replace('entrar.html');
+  };
+
+  async function comprar(bt) {
+    bt.disabled = true; var antes = bt.textContent; bt.textContent = 'Abrindo o pagamento…';
+    try {
+      var r = await fetch(C.api + '/comprar', { method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessao: sessao }) });
+      var j = await r.json();
+      if (j.ok && j.link) { location.href = j.link; return; }
+      erro(j.erro === 'sessao_invalida' ? 'Sua sessão expirou. Entre de novo.'
+        : 'Não consegui abrir o pagamento agora. Tente em alguns instantes.');
+    } catch (e) { erro('Não consegui falar com o servidor. Confira sua internet.'); }
+    bt.disabled = false; bt.textContent = antes;
+  }
+
+  function pintar(d) {
+    el('carregando').classList.add('oculto');
+    el('tudo').classList.remove('oculto');
+    el('ola').textContent = d.nome ? 'Olá, ' + d.nome + '.' : 'Bem-vindo.';
+    el('dEmail').textContent = d.email || '—';
+    el('dNome').textContent = d.nome || '—';
+    el('dDesde').textContent = d.desde ? new Date(d.desde).toLocaleDateString('pt-BR') : '—';
+    el('dPc').textContent = d.computador || 'nenhum ainda';
+
+    var pino = el('pino'), tit = el('titulo'), det = el('detalhe'), ac = el('acoes');
+    ac.innerHTML = '';
+
+    if (d.plano === 'ativo' || d.plano === 'teste') {
+      pino.className = 'pino p-ativo'; pino.textContent = '● Acesso liberado';
+      tit.textContent = 'Tudo certo. O WhaLead é seu.';
+      det.textContent = d.ate ? 'Válido até ' + diaBR(d.ate) + '.'
+        : 'Pagamento único, já quitado. Sem data de expiração.';
+      el('comoUsar').classList.remove('oculto');
+    } else {
+      pino.className = 'pino p-sem'; pino.textContent = '● Falta liberar';
+      tit.textContent = 'Seu acesso ainda não foi liberado';
+      det.textContent = d.motivo || ((C.preco || '') +
+        ' em pagamento único, com ' + (C.garantiaDias || 7) + ' dias de garantia.');
+      var b = document.createElement('button');
+      b.className = 'btn verde'; b.textContent = 'Comprar agora';
+      b.onclick = function () { comprar(b); };
+      ac.appendChild(b);
+      el('comoUsar').classList.add('oculto');
+    }
+  }
+
+  (async function () {
+    try {
+      var r = await fetch(C.api + '/eu', { method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessao: sessao }) });
+      if (r.status === 401) { localStorage.removeItem('wl_sessao');
+        location.replace('entrar.html'); return; }
+      var j = await r.json();
+      if (!j.ok) throw new Error('ruim');
+      pintar(j);
+      // veio direto do cadastro: já abre o pagamento
+      if (new URLSearchParams(location.search).get('comprar') === '1'
+          && j.plano !== 'ativo') {
+        var bt = el('acoes').querySelector('button'); if (bt) comprar(bt);
+      }
+    } catch (e) {
+      el('carregando').textContent =
+        'Não consegui carregar sua conta. Confira sua internet e atualize a página.';
+    }
+  })();
+})();
+</script>
+</body>
+</html>
