@@ -31,6 +31,11 @@ window.WHALEAD_CONFIG = {
   // api:       'https://whalead-licencas.whalead-crm.workers.dev',
   checkoutUrl:  'https://mpago.li/2du2Do1',
 
-  /* ---- contato -------------------------------------------------------- */
-  suporte:      'whalead.crm@gmail.com'
+  /* ---- contato --------------------------------------------------------
+     O botão de suporte, no canto da tela, abre um cartão com as formas de
+     falar com você. Preenchendo `whatsapp`, aparece lá um botão verde que
+     abre a conversa direto — para quem está no celular, é o que de fato
+     funciona. Escreva só os números, com DDI e DDD: 5511987654321.        */
+  suporte:      'whalead.crm@gmail.com',
+  whatsapp:     ''
 };

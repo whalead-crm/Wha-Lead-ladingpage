@@ -86,24 +86,43 @@ preencha e a página passa a mostrar a parcela.
 
 ## 4. O botão de suporte
 
-Um botão escuro e arredondado, fixo no canto **inferior direito**, nas sete
-páginas. Clicou, abre o e-mail já endereçado para `whalead.crm@gmail.com`, com o
-assunto *"Suporte WhaLead"* preenchido.
+Botão escuro e arredondado, fixo no canto **inferior direito**, nas sete páginas.
 
-No celular ele sobe sozinho para não cobrir a barra de compra. Não tem arquivo
-novo: quem desenha o botão é o `comum.js`, então ele aparece em qualquer página
-que você criar daqui para a frente, desde que ela carregue esse arquivo.
+**Ele não é um link de e-mail.** Já foi, e era um erro: `mailto:` depende de a
+pessoa ter um programa de e-mail configurado. Quem não tem — e é muita gente,
+principalmente no celular — clicava e **não acontecia nada**. Pior tipo de
+defeito: o silencioso.
 
-Para mudar o endereço, só o `config.js`:
+Agora o botão abre um cartãozinho com saídas que não dependem de configuração:
+
+| Opção | Funciona quando |
+|---|---|
+| **Abrir o WhatsApp** | aparece só se você preencher `whatsapp` no `config.js` |
+| **Escrever pelo Gmail** | em qualquer navegador, sem instalar nada |
+| **Usar meu programa de e-mail** | o `mailto:` de sempre, para quem tem Outlook e afins |
+| **Copiar o endereço** | sempre — e o e-mail ainda fica escrito no cartão |
+
+Fecha clicando fora ou com Esc. No celular ele sobe sozinho para não cobrir a
+barra de compra, e some na impressão.
+
+### Ligue o WhatsApp — leva dez segundos
+
+Você vende uma ferramenta de WhatsApp. O cliente que trava às 22h quer mandar
+mensagem, não escrever e-mail. No `config.js`:
+
+```js
+whatsapp: '5511987654321',   // DDI + DDD + número, só dígitos
+```
+
+Pronto: nasce um botão verde no topo do cartão, abrindo a conversa com a
+mensagem *"Olá! Preciso de ajuda com o WhaLead."* já digitada. Em branco, o
+botão simplesmente não aparece e o resto continua funcionando.
+
+Para mudar o e-mail, mesma coisa, uma linha:
 
 ```js
 suporte: 'whalead.crm@gmail.com',
 ```
-
-> **Vale pensar:** você vende uma ferramenta de WhatsApp, e muita gente no
-> celular não tem e-mail configurado — clica no botão e não acontece nada. Se
-> quiser, me passe um número e eu troco por um botão de WhatsApp
-> (`wa.me/55DDDNUMERO`), que abre a conversa direto. Dá para ter os dois também.
 
 ---
 
