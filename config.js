@@ -32,5 +32,5 @@ window.WHALEAD_CONFIG = {
   checkoutUrl:  'https://mpago.li/2du2Do1',
 
   /* ---- contato -------------------------------------------------------- */
-  suporte:      'suporte@whalead.com.br'
+  suporte:      'whalead.crm@gmail.com'
 };

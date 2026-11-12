@@ -42,14 +42,15 @@ abrir na hora e o cliente desistir antes de ver o preço.
 
 ```
 index.html         a página de vendas
-criar-conta.html   cadastro (e-mail + senha) antes de pagar
+criar-conta.html   cadastro (nome, e-mail, telefone e senha) antes de pagar
 entrar.html        login de quem já comprou
 painel.html        área do cliente: status do acesso e dados
 obrigado.html      tela de volta do pagamento
 termos.html        termos de uso
 privacidade.html   política de privacidade
 config.js          >>> O ÚNICO ARQUIVO QUE VOCÊ PRECISA EDITAR <<<
-comum.js           preenche preço e textos e roteia os botões
+comum.js           preenche preço e textos, roteia os botões e desenha
+                   o botão de suporte das 7 páginas
 conta.css          estilo das telas de conta
 logo-whalead.png   o logo
 brand.png          o ícone (favicon)
@@ -72,7 +73,7 @@ vitalicio:    true,
 garantiaDias: 7,
 api:          '',            // vazio = botão vai direto ao Mercado Pago
 checkoutUrl:  'https://mpago.li/2du2Do1',
-suporte:      'suporte@whalead.com.br'
+suporte:      'whalead.crm@gmail.com'
 ```
 
 **`precoParcela` em branco é de propósito.** Prometer "12x de R$ 24,99 sem juros"
@@ -83,7 +84,30 @@ preencha e a página passa a mostrar a parcela.
 
 ---
 
-## 4. A chave de virada: o campo `api`
+## 4. O botão de suporte
+
+Um botão escuro e arredondado, fixo no canto **inferior direito**, nas sete
+páginas. Clicou, abre o e-mail já endereçado para `whalead.crm@gmail.com`, com o
+assunto *"Suporte WhaLead"* preenchido.
+
+No celular ele sobe sozinho para não cobrir a barra de compra. Não tem arquivo
+novo: quem desenha o botão é o `comum.js`, então ele aparece em qualquer página
+que você criar daqui para a frente, desde que ela carregue esse arquivo.
+
+Para mudar o endereço, só o `config.js`:
+
+```js
+suporte: 'whalead.crm@gmail.com',
+```
+
+> **Vale pensar:** você vende uma ferramenta de WhatsApp, e muita gente no
+> celular não tem e-mail configurado — clica no botão e não acontece nada. Se
+> quiser, me passe um número e eu troco por um botão de WhatsApp
+> (`wa.me/55DDDNUMERO`), que abre a conversa direto. Dá para ter os dois também.
+
+---
+
+## 5. A chave de virada: o campo `api`
 
 ### Hoje (`api: ''`) — o que já funciona
 Todo botão de comprar vai **direto para o seu link do Mercado Pago**.
@@ -130,7 +154,7 @@ telefone só começa a ser pedido quando você publicar o servidor.
 
 ---
 
-## 5. A palavra "assinatura" saiu de tudo que o cliente lê
+## 6. A palavra "assinatura" saiu de tudo que o cliente lê
 
 Você apontou o painel dentro do WhatsApp: o cabeçalho ainda dizia
 **"sem assinatura"**. Varri o produto inteiro e tirei o termo de todo texto visível:
@@ -152,22 +176,23 @@ voltar a aparecer em algum texto da extensão, o teste quebra.
 
 ---
 
-## 6. Antes de publicar — três coisas obrigatórias
+## 7. Antes de publicar — três coisas obrigatórias
 
 1. **Seus dados de fornecedor.** Em `termos.html` e `privacidade.html` há
    `[a preencher]` para razão social/nome, CNPJ ou CPF e endereço. O artigo 33
    do CDC exige isso em venda a distância, e a Chrome Web Store também pede.
    Procure por `>>> PREENCHA` nos dois arquivos.
-2. **O e-mail de suporte.** `suporte@whalead.com.br` está no `config.js`.
-   Se esse endereço ainda não existe, troque por um que você leia todo dia —
-   é para onde vão os pedidos de reembolso e os prazos do CDC correm mesmo assim.
+2. **O e-mail de suporte** é `whalead.crm@gmail.com`, no `config.js`.
+   Trocou ali, trocou nas 7 páginas e no botão flutuante. Leia essa caixa todo
+   dia: é para onde chegam os pedidos de reembolso, e o prazo de 7 dias do CDC
+   corre mesmo que ninguém abra o e-mail.
 3. **Confira o checkout.** Abra `https://mpago.li/2du2Do1` e veja se mostra
    **R$ 299,90** (o seu LEIA-ME antigo dizia 299,99). Preço diferente entre
    página e checkout é reclamação no Procon na certa.
 
 ---
 
-## 7. Como publicar
+## 8. Como publicar
 
 ### GitHub Pages — `whalead-crm/Wha-Lead-ladingpage`
 Mande **todos** os arquivos desta pasta para a raiz do repositório e faça commit
@@ -192,7 +217,7 @@ servidor. Teste também no celular: a barra fixa de compra só aparece lá.
 
 ---
 
-## 8. Aviso vindo da extensão
+## 9. Aviso vindo da extensão
 
 Abra o site com `?origem=extensao` no fim do endereço para mostrar a faixa
 "Você encontrou um recurso Pro":
@@ -205,13 +230,13 @@ Nunca coloque senha ou token na URL.
 
 ---
 
-## 9. O que ainda não está pronto
+## 10. O que ainda não está pronto
 
 - **Liberação automática do Pro** — depende de publicar o servidor de licenças
   e preencher o `api`.
 - **"Esqueci minha senha"** — hoje o link manda e-mail para o suporte e você
   reseta na mão. Para ser automático, precisa de domínio próprio e um serviço
   de envio (Resend, por exemplo).
-- **Dados do fornecedor** nos termos e na privacidade (item 6).
+- **Dados do fornecedor** nos termos e na privacidade (item 7).
 - **Fonte do site:** a página usa Google Fonts. Dentro de pré-visualizações sem
   internet ela aparece com a fonte do sistema; no navegador, normal.
