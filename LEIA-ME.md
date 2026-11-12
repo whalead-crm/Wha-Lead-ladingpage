@@ -15,6 +15,7 @@ Não é assinatura, não é mensalidade, não tem teste grátis.**
 | Páginas | 1 | **7** |
 | Botões de compra | 3 | **6**, mais a barra fixa no celular |
 | Criar conta / entrar | não existia | `criar-conta.html`, `entrar.html`, `painel.html` |
+| Cadastro pede | — | nome, e-mail, **telefone com DDD** e senha |
 | Termos e privacidade | não existia | `termos.html`, `privacidade.html` |
 
 **Por que caiu tanto de peso:** o seu `index.html` trazia o logo em base64
@@ -112,9 +113,46 @@ automaticamente e você para de destravar cliente no WhatsApp de madrugada.
 As telas de conta esperam estes endereços:
 `POST /criar-conta`, `POST /entrar`, `POST /eu`, `POST /sair`, `POST /comprar`.
 
+### O telefone no cadastro
+`criar-conta.html` pede **telefone com DDD**, obrigatório. A tela formata sozinha
+enquanto a pessoa digita — `(11) 98765-4321` — e recusa número incompleto, DDD que
+não existe e celular de 11 dígitos sem o 9. No banco fica só o número:
+`11987654321`.
+
+O servidor também repassa o telefone ao checkout, então o Mercado Pago já abre com
+o campo preenchido — menos digitação na hora de pagar, menos carrinho abandonado.
+
+> Banco de dados que já existe? Rode uma vez:
+> `ALTER TABLE contas ADD COLUMN telefone TEXT;`
+
+Com `api` vazio o cadastro nem aparece: o botão vai direto ao Mercado Pago. O
+telefone só começa a ser pedido quando você publicar o servidor.
+
 ---
 
-## 5. Antes de publicar — três coisas obrigatórias
+## 5. A palavra "assinatura" saiu de tudo que o cliente lê
+
+Você apontou o painel dentro do WhatsApp: o cabeçalho ainda dizia
+**"sem assinatura"**. Varri o produto inteiro e tirei o termo de todo texto visível:
+
+| Onde | Antes | Agora |
+|---|---|---|
+| Painel no WhatsApp Web | sem assinatura | acesso não liberado |
+| Entrando na conta | Conferindo sua assinatura… | Conferindo seu acesso… |
+| Chave antiga | Quem **assina** pelo site… | Quem **compra** pelo site… |
+| Erro sem internet | conferir sua assinatura | conferir seu acesso |
+| Servidor, outro PC | Essa/Sua **assinatura** está em uso | Esse/Seu **acesso** está em uso |
+
+Ficaram de fora, de propósito: **"não é mensalidade"** e **"não é assinatura"** —
+negar é justamente o que a gente quer dizer. E dentro do código, os nomes de função
+que falam em *assinatura digital*: isso é criptografia do comprovante, não cobrança.
+
+Tem um teste automático vigiando isso agora (`t59.js`, seção 17): se a palavra
+voltar a aparecer em algum texto da extensão, o teste quebra.
+
+---
+
+## 6. Antes de publicar — três coisas obrigatórias
 
 1. **Seus dados de fornecedor.** Em `termos.html` e `privacidade.html` há
    `[a preencher]` para razão social/nome, CNPJ ou CPF e endereço. O artigo 33
@@ -129,7 +167,7 @@ As telas de conta esperam estes endereços:
 
 ---
 
-## 6. Como publicar
+## 7. Como publicar
 
 ### GitHub Pages — `whalead-crm/Wha-Lead-ladingpage`
 Mande **todos** os arquivos desta pasta para a raiz do repositório e faça commit
@@ -154,7 +192,7 @@ servidor. Teste também no celular: a barra fixa de compra só aparece lá.
 
 ---
 
-## 7. Aviso vindo da extensão
+## 8. Aviso vindo da extensão
 
 Abra o site com `?origem=extensao` no fim do endereço para mostrar a faixa
 "Você encontrou um recurso Pro":
@@ -167,13 +205,13 @@ Nunca coloque senha ou token na URL.
 
 ---
 
-## 8. O que ainda não está pronto
+## 9. O que ainda não está pronto
 
 - **Liberação automática do Pro** — depende de publicar o servidor de licenças
   e preencher o `api`.
 - **"Esqueci minha senha"** — hoje o link manda e-mail para o suporte e você
   reseta na mão. Para ser automático, precisa de domínio próprio e um serviço
   de envio (Resend, por exemplo).
-- **Dados do fornecedor** nos termos e na privacidade (item 5).
+- **Dados do fornecedor** nos termos e na privacidade (item 6).
 - **Fonte do site:** a página usa Google Fonts. Dentro de pré-visualizações sem
   internet ela aparece com a fonte do sistema; no navegador, normal.

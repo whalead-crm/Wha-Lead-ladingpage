@@ -44,6 +44,7 @@
       <dl>
         <dt>E-mail</dt><dd id="dEmail">—</dd>
         <dt>Nome</dt><dd id="dNome">—</dd>
+        <dt>Telefone</dt><dd id="dTel">—</dd>
         <dt>Cliente desde</dt><dd id="dDesde">—</dd>
         <dt>Computador conectado</dt><dd id="dPc">—</dd>
       </dl>
@@ -73,6 +74,12 @@
   }
   if (!sessao) { location.replace('entrar.html'); return; }
 
+  function fone(t) {
+    var n = String(t || '').replace(/\D+/g, '');
+    if (n.length === 11) return '(' + n.slice(0,2) + ') ' + n.slice(2,7) + '-' + n.slice(7);
+    if (n.length === 10) return '(' + n.slice(0,2) + ') ' + n.slice(2,6) + '-' + n.slice(6);
+    return n;
+  }
   function diaBR(iso) { if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
     var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
   function erro(t) { el('erro').textContent = t; el('erro').className = 'erro on'; }
@@ -104,6 +111,7 @@
     el('ola').textContent = d.nome ? 'Olá, ' + d.nome + '.' : 'Bem-vindo.';
     el('dEmail').textContent = d.email || '—';
     el('dNome').textContent = d.nome || '—';
+    el('dTel').textContent = fone(d.telefone) || '—';
     el('dDesde').textContent = d.desde ? new Date(d.desde).toLocaleDateString('pt-BR') : '—';
     el('dPc').textContent = d.computador || 'nenhum ainda';
 

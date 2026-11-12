@@ -34,6 +34,13 @@
       <p class="dica">Use um e-mail que você consulta — é por ele que falamos com você.</p>
     </div>
     <div class="campo">
+      <label for="tel">Telefone com DDD</label>
+      <input id="tel" type="tel" inputmode="numeric" autocomplete="tel"
+             placeholder="(11) 98765-4321" maxlength="16" required>
+      <p class="dica">É por aqui que a gente resolve qualquer coisa com você — e é o
+        número que vai no seu recibo.</p>
+    </div>
+    <div class="campo">
       <label for="senha">Senha</label>
       <input id="senha" type="password" autocomplete="new-password"
              placeholder="Pelo menos 8 letras ou números" required>
@@ -60,12 +67,40 @@
   function erro(t) { cx.textContent = t; cx.className = 'erro on';
     bt.disabled = false; bt.textContent = 'Criar conta e continuar'; }
 
+  /* ---- telefone: a pessoa digita só números e a tela formata sozinha ---- */
+  var so = function (v) {
+    return String(v || '').replace(/\D+/g, '').replace(/^0+/, '')
+      .replace(/^55(?=\d{10,11}$)/, '').slice(0, 11);
+  };
+  function mascara(v) {
+    var n = so(v);
+    if (n.length <= 2)  return n.length ? '(' + n : '';
+    if (n.length <= 6)  return '(' + n.slice(0,2) + ') ' + n.slice(2);
+    if (n.length <= 10) return '(' + n.slice(0,2) + ') ' + n.slice(2,6) + '-' + n.slice(6);
+    return '(' + n.slice(0,2) + ') ' + n.slice(2,7) + '-' + n.slice(7);
+  }
+  function problemaDoTelefone(n) {
+    if (!n) return 'Escreva seu telefone com DDD.';
+    if (n.length < 10) return 'Faltam dígitos no telefone. Escreva o DDD e o número.';
+    if (Number(n.slice(0,2)) < 11) return 'Esse DDD não existe. Confira os dois primeiros dígitos.';
+    if (n.length === 11 && n[2] !== '9')
+      return 'Celular tem 9 na frente do número. Confira, ou tire um dígito se for fixo.';
+    if (/^(\d)\1+$/.test(n.slice(2))) return 'Esse número não parece de verdade. Confira.';
+    return '';
+  }
+  var cTel = document.getElementById('tel');
+  cTel.addEventListener('input', function () { cTel.value = mascara(cTel.value); });
+  cTel.addEventListener('blur', function () { cTel.value = mascara(cTel.value); });
+
   f.addEventListener('submit', async function (ev) {
     ev.preventDefault();
     cx.className = 'erro';
     var email = document.getElementById('email').value.trim(),
-        senha = document.getElementById('senha').value;
+        senha = document.getElementById('senha').value,
+        tel   = so(document.getElementById('tel').value);
     if (!email) return erro('Escreva seu e-mail.');
+    var ruimTel = problemaDoTelefone(tel);
+    if (ruimTel) return erro(ruimTel);
     if (senha.length < 8) return erro('A senha precisa de pelo menos 8 letras ou números.');
 
     if (!C.api) {   // servidor ainda não publicado: segue direto ao pagamento
@@ -77,7 +112,7 @@
       var r = await fetch(C.api + '/criar-conta', {
         method: 'POST', headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ nome: document.getElementById('nome').value.trim(),
-          email: email, senha: senha, apelido: 'Site' })
+          email: email, telefone: tel, senha: senha, apelido: 'Site' })
       });
       var j = await r.json();
       if (!j.ok) return erro(j.erro === 'ja_existe'
