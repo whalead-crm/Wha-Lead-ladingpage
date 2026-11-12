@@ -47,7 +47,8 @@
      Com servidor configurado, o caminho passa pela conta: é assim que a
      liberação acontece sozinha. Sem servidor, vai direto ao checkout e
      a liberação fica manual.                                            */
-  var destino = C.api ? 'criar-conta.html' : (C.checkoutUrl || '#');
+  var destino2 = C.api ? 'criar-conta.html' : (C.checkoutUrl || '#');
+  var destino = destino2;
   var externo = !C.api;
   document.querySelectorAll('[data-comprar]').forEach(function (a) {
     a.setAttribute('href', destino);
@@ -138,13 +139,33 @@
        desenhado o cartão de opções, varre daqui                            */
     document.querySelectorAll('.wl-sup-cx').forEach(function (v) { v.remove(); });
 
-    /* "Esqueci minha senha" e qualquer outro link marcado vão para o mesmo lugar */
-    document.querySelectorAll('[data-abrir-suporte],[data-suporte-botao]').forEach(function (el) {
+    /* "Esqueci minha senha" e qualquer outro link marcado vão para o mesmo lugar.
+       Alguns nascem depois, criados por script da própria página — por isso
+       ligamos também tudo o que aparecer no documento daqui pra frente.    */
+    function ligar(el) {
       el.setAttribute('href', destino);
       el.setAttribute('target', '_blank');
       el.setAttribute('rel', 'noopener');
       el.style.cursor = 'pointer';
-    });
+    }
+    var marca = '[data-abrir-suporte],[data-suporte-botao]';
+    document.querySelectorAll(marca).forEach(ligar);
+    new MutationObserver(function (lista) {
+      lista.forEach(function (m) {
+        m.addedNodes.forEach(function (no) {
+          if (no.nodeType !== 1) return;
+          if (no.matches && no.matches(marca)) ligar(no);
+          if (no.querySelectorAll) no.querySelectorAll(marca).forEach(ligar);
+          /* botões de comprar criados depois também precisam de endereço */
+          var cs = (no.matches && no.matches('[data-comprar]')) ? [no]
+                 : (no.querySelectorAll ? [].slice.call(no.querySelectorAll('[data-comprar]')) : []);
+          cs.forEach(function (a) {
+            a.setAttribute('href', destino2);
+            if (externo) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); }
+          });
+        });
+      });
+    }).observe(document.documentElement, { childList: true, subtree: true });
   })();
 
   /* ---- a faixa que aparece quando a visita vem da extensão ---- */

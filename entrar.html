@@ -38,8 +38,8 @@
 <footer>© <span data-t="ano">2026</span> WhaLead ·
   <a href="privacidade.html">Privacidade</a> · <a href="termos.html">Termos</a></footer>
 
-<script src="config.js?v=9"></script>
-<script src="comum.js?v=9"></script>
+<script src="config.js?v=10"></script>
+<script src="comum.js?v=10"></script>
 <script>
 (function () {
   var C = window.WHALEAD_CONFIG || {};
@@ -47,6 +47,32 @@
       cx = document.getElementById('erro');
   var g = localStorage.getItem('wl_email');
   if (g) document.getElementById('email').value = g;
+
+  /* ---- enquanto o servidor de contas não estiver publicado -------------
+     Antes, a pessoa preenchia e-mail e senha, clicava em Entrar e batia
+     numa tarja vermelha. Pedir o que não dá para atender é o pior jeito
+     de avisar. Agora o aviso vem antes, no lugar do formulário, e com os
+     dois caminhos que realmente resolvem alguma coisa.
+     Some sozinho no dia em que `api` for preenchido no config.js.       */
+  if (!C.api) {
+    var caixa = document.createElement('div');
+    caixa.className = 'cartao';
+    caixa.innerHTML =
+      '<p style="margin:0 0 6px;font-weight:700;color:#112b24;font-size:16px">' +
+      'A entrada na conta ainda não está disponível</p>' +
+      '<p style="margin:0 0 18px">Estamos terminando esta parte. Se você já ' +
+      'comprou, <b>a extensão é liberada pelo suporte</b> — escreva e nós ' +
+      'respondemos com o seu acesso.</p>' +
+      '<a class="btn verde" data-suporte-botao style="display:flex;align-items:center;' +
+      'justify-content:center;text-decoration:none">Falar com o suporte</a>' +
+      '<a class="btn claro" data-comprar style="display:flex;align-items:center;' +
+      'justify-content:center;text-decoration:none">Ainda não comprei</a>';
+    f.replaceWith(caixa);
+    document.querySelector('.sub').textContent =
+      'Já comprou? O suporte libera seu acesso.';
+    var pe = document.querySelector('.pe'); if (pe) pe.remove();
+    return;   // nada abaixo faz sentido sem servidor
+  }
 
   function erro(t) { cx.textContent = t; cx.className = 'erro on';
     bt.disabled = false; bt.textContent = 'Entrar'; }

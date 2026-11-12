@@ -127,6 +127,14 @@ amanhã não quebra mais nada.
 programa de e-mail configurado. Virou link normal para o WhatsApp ou o Gmail:
 link o navegador sempre abre.
 
+### Os links de e-mail escritos no texto
+
+Em dez lugares do site o endereço aparece escrito — no rodapé, na garantia, nas
+dúvidas, nos termos, na privacidade, no painel. Todos eles são
+`<a data-suporte>` e **abrem o Gmail já endereçado**, igual ao botão. Não
+precisa escrever o endereço em lugar nenhum do HTML: o script preenche o texto
+e o link a partir do `config.js`. Trocou o e-mail lá, trocou nos dez.
+
 O `teste-botao.js` carrega as sete páginas num navegador de verdade e mede o
 botão em cada uma. Se ele deformar ou parar de ir direto, o teste quebra.
 

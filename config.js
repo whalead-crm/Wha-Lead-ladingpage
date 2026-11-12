@@ -21,14 +21,12 @@ window.WHALEAD_CONFIG = {
   garantiaDias: 7,      // direito de arrependimento (CDC, art. 49)
 
   /* ---- para onde vai o botão de comprar -------------------------------
-     Enquanto o servidor de licenças não estiver publicado, deixe `api`
-     vazio: os botões vão direto para o seu link do Mercado Pago.
+     LIGADO em 12/11/2026. O servidor está no ar e testado: o cliente cria
+     conta antes de pagar e o acesso é liberado pelo painel.
 
-     Quando o servidor estiver no ar, preencha `api`. Aí o cliente passa
-     a criar conta antes de pagar, e o acesso é liberado sozinho — sem
-     você precisar destravar ninguém na mão.                              */
-  api:          '',
-  // api:       'https://whalead-licencas.whalead-crm.workers.dev',
+     Se algum dia precisar desligar o login e mandar todo mundo direto
+     para o checkout, basta deixar `api` em branco.                       */
+  api:          'https://whalead-licencas.whalead-crm.workers.dev',
   checkoutUrl:  'https://mpago.li/2du2Do1',
 
   /* ---- contato --------------------------------------------------------
