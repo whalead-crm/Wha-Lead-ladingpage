@@ -227,10 +227,10 @@ voltar a aparecer em algum texto da extensão, o teste quebra.
 
 ## 8. Como publicar
 
-### GitHub Pages — `whalead-crm/Wha-Lead-ladingpage`
+### GitHub Pages — `whalead-crm/WhaLead`
 Mande **todos** os arquivos desta pasta para a raiz do repositório e faça commit
 na branch de produção. O site sai em
-`https://whalead-crm.github.io/Wha-Lead-ladingpage/`.
+`https://whalead-crm.github.io/WhaLead/`.
 
 > O repositório está escrito **`ladingpage`** — falta o *n* de *landing*.
 > Dá para corrigir em Settings → Repository name; o endereço do site muda junto,
@@ -256,7 +256,7 @@ Abra o site com `?origem=extensao` no fim do endereço para mostrar a faixa
 "Você encontrou um recurso Pro":
 
 ```
-https://whalead-crm.github.io/Wha-Lead-ladingpage/?origem=extensao
+https://whalead-crm.github.io/WhaLead/?origem=extensao
 ```
 
 Nunca coloque senha ou token na URL.
