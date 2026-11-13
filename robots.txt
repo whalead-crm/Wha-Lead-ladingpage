@@ -1,0 +1,27 @@
+# As páginas de termos e privacidade trazem a identificação do fornecedor
+# (nome, CPF e endereço), exigida pelo Decreto 7.962/2013. Elas continuam
+# abertas a qualquer pessoa — só não entram em buscador nem em cache, para
+# o documento não virar resultado de pesquisa.
+User-agent: *
+Disallow: /termos.html
+Disallow: /privacidade.html
+
+# Raspadores de dados conhecidos: fora.
+User-agent: CCBot
+Disallow: /
+User-agent: GPTBot
+Disallow: /
+User-agent: ClaudeBot
+Disallow: /
+User-agent: Bytespider
+Disallow: /
+User-agent: PetalBot
+Disallow: /
+User-agent: DataForSeoBot
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+User-agent: MJ12bot
+Disallow: /

@@ -14,6 +14,18 @@
     parcelado: parcelado,
     precoCompleto: C.preco + ' à vista, ou ' + parcelado,
     garantia: String(C.garantiaDias || 7),
+    /* O prazo da licença escrito por extenso, para os termos. Sai daqui e
+       não da mão de ninguém: mudou validadeDias no config, muda no texto.
+       Lembre que DIAS_ACESSO, na Cloudflare, tem que contar o mesmo. */
+    validade: (function () {
+      if (C.vitalicio) return 'sem prazo de vencimento';
+      var d = Number(C.validadeDias || 365);
+      if (d === 365) return '1 (um) ano';
+      if (d % 365 === 0) return (d / 365) + ' anos';
+      if (d % 30 === 0) return (d / 30) + ' meses';
+      return d + ' dias';
+    })(),
+    validadeDias: String(C.validadeDias || 365),
     suporte: C.suporte || 'whalead.crm@gmail.com',
     ano: String(new Date().getFullYear())
   };
