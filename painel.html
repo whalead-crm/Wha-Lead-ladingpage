@@ -48,9 +48,6 @@
         <dt>Cliente desde</dt><dd id="dDesde">—</dd>
         <dt>Computador conectado</dt><dd id="dPc">—</dd>
       </dl>
-      <p style="margin-top:16px;font-size:13.5px">Precisa de recibo, quer trocar de
-        computador ou desistir da compra? Escreva para
-        <a data-suporte style="color:#11b95d;font-weight:650">whalead.crm@gmail.com</a>.</p>
     </div>
   </div>
 </div></main>
@@ -120,15 +117,16 @@
 
     if (d.plano === 'ativo' || d.plano === 'teste') {
       pino.className = 'pino p-ativo'; pino.textContent = '● Acesso liberado';
-      tit.textContent = 'Tudo certo. O WhaLead é seu.';
-      det.textContent = d.ate ? 'Válido até ' + diaBR(d.ate) + '.'
-        : 'Pagamento único, já quitado. Sem data de expiração.';
+      tit.textContent = 'Tudo certo. Seu acesso está liberado.';
+      det.textContent = d.ate
+        ? 'Sua licença vale até ' + diaBR(d.ate) + '. Nada é cobrado automaticamente.'
+        : 'Licença sem data de vencimento, já quitada.';
       el('comoUsar').classList.remove('oculto');
     } else {
       pino.className = 'pino p-sem'; pino.textContent = '● Falta liberar';
       tit.textContent = 'Seu acesso ainda não foi liberado';
       det.textContent = d.motivo || ((C.preco || '') +
-        ' em pagamento único, com ' + (C.garantiaDias || 7) + ' dias de garantia.');
+        ' pela licença de 1 ano, com ' + (C.garantiaDias || 7) + ' dias de garantia.');
       var b = document.createElement('button');
       b.className = 'btn verde'; b.textContent = 'Comprar agora';
       b.onclick = function () { comprar(b); };

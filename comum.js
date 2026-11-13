@@ -135,6 +135,56 @@
     });
     document.body.appendChild(a);
 
+    /* ---- sai da frente -------------------------------------------------
+       O botão é fixo no canto, então em certas rolagens ele para em cima
+       de um "Comprar agora" e rouba o clique. Em vez de empurrar a página
+       inteira para cima, ele some enquanto estiver sobrepondo qualquer
+       botão, e volta sozinho depois. Quem manda é sempre o botão da
+       página: o suporte é que cede.                                       */
+    var CLICAVEIS = '[data-comprar],.btn,.button,button,input[type=submit]';
+    var escondido = false;
+    function encosta(r, b, folga) {
+      return b.right > r.left - folga && b.left < r.right + folga &&
+             b.bottom > r.top - folga && b.top < r.bottom + folga;
+    }
+    function reposicionar() {
+      /* medimos sempre visível: opacidade 0 mantém o elemento no layout,
+         então o retângulo continua valendo mesmo escondido.              */
+      var r = a.getBoundingClientRect();
+      var alvos = document.querySelectorAll(CLICAVEIS);
+      var bate = false;
+      for (var i = 0; i < alvos.length; i++) {
+        var e = alvos[i];
+        if (e === a || a.contains(e) || e.contains(a)) continue;
+        var b = e.getBoundingClientRect();
+        if (!b.width && !b.height) continue;              /* escondido */
+        if (b.bottom < 0 || b.top > innerHeight) continue; /* fora da tela */
+        /* folga maior para sumir do que para voltar: sem essa diferença, o
+           empurrãozinho de 2px do :hover bastaria para ligar e desligar o
+           botão em sequência.                                            */
+        if (encosta(r, b, escondido ? 6 : 14)) { bate = true; break; }
+      }
+      if (bate === escondido) return;
+      escondido = bate;
+      /* só opacidade: mover ou encolher mudaria o próprio retângulo medido
+         acima, e o botão entraria em pisca-pisca — some, o retângulo sai de
+         baixo do outro, reaparece, colide de novo, e assim sem parar.     */
+      a.style.setProperty('opacity', bate ? '0' : '1', 'important');
+      a.style.setProperty('pointer-events', bate ? 'none' : 'auto', 'important');
+    }
+    var pedido = 0;
+    function agendar() {
+      if (pedido) return;
+      pedido = requestAnimationFrame(function () { pedido = 0; reposicionar(); });
+    }
+    a.style.setProperty('transition',
+      'opacity .16s,background .18s,box-shadow .18s', 'important');
+    addEventListener('scroll', agendar, { passive: true });
+    addEventListener('resize', agendar);
+    /* o painel desenha o "Comprar agora" só depois de falar com o servidor */
+    new MutationObserver(agendar).observe(document.body, { childList: true, subtree: true });
+    [0, 250, 800, 2000].forEach(function (ms) { setTimeout(agendar, ms); });
+
     /* se o navegador tiver guardado a versão antiga em cache e ela já tiver
        desenhado o cartão de opções, varre daqui                            */
     document.querySelectorAll('.wl-sup-cx').forEach(function (v) { v.remove(); });

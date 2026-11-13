@@ -16,8 +16,15 @@ window.WHALEAD_CONFIG = {
   // enganosa. Em branco, o site fala apenas "em até 12x".
   precoParcela: '',
 
-  /* ---- o que o cliente leva ------------------------------------------ */
-  vitalicio:    true,   // true = pagamento único, acesso para sempre
+  /* ---- o que o cliente leva ------------------------------------------
+     A licença vale 1 ano a contar do dia da compra, e não renova sozinha.
+
+     ATENÇÃO: quem manda de verdade no prazo é a variável DIAS_ACESSO do
+     servidor, na Cloudflare. Aqui é só o texto do site. Se mudar um, mude
+     o outro — prazo anunciado diferente do prazo entregue é infração ao
+     Código de Defesa do Consumidor, art. 37.                             */
+  vitalicio:    false,  // false = a licença vence
+  validadeDias: 365,    // tem que bater com DIAS_ACESSO lá na Cloudflare
   garantiaDias: 7,      // direito de arrependimento (CDC, art. 49)
 
   /* ---- para onde vai o botão de comprar -------------------------------
